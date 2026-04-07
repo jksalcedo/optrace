@@ -3,92 +3,81 @@ package com.jksalcedo.optrace
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.dp
+import com.jksalcedo.optrace.core.capability.CapabilityResolverImpl
+import com.jksalcedo.optrace.core.capability.CapabilityState
+import com.jksalcedo.optrace.domain.model.CapabilityTier
 import com.jksalcedo.optrace.ui.theme.OpTraceTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private val capabilityResolver = CapabilityResolverImpl()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             OpTraceTheme {
-                OpTraceApp()
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    StatusScreen(capabilityResolver)
+                }
             }
         }
     }
 }
 
-@PreviewScreenSizes
 @Composable
-fun OpTraceApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+fun StatusScreen(resolver: CapabilityResolverImpl) {
+    var state by remember { mutableStateOf<CapabilityState?>(null) }
+    val scope = rememberCoroutineScope()
 
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            AppDestinations.entries.forEach {
-                item(
-                    icon = {
-                        Icon(
-                            it.icon,
-                            contentDescription = it.label
-                        )
-                    },
-                    label = { Text(it.label) },
-                    selected = it == currentDestination,
-                    onClick = { currentDestination = it }
-                )
-            }
-        }
+    LaunchedEffect(Unit) {
+        state = resolver.resolve()
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
+        Text("OpTrace Status", style = MaterialTheme.typography.headlineMedium)
+        Spacer(Modifier.height(16.dp))
+
+        state?.let { s ->
+            StatusRow("Capability Tier", s.tier.name)
+            StatusRow("Shizuku Available", s.shizukuAvailable.toString())
+            StatusRow("Root Available", s.rootAvailable.toString())
+        } ?: Text("Loading status...")
+
+        Spacer(Modifier.height(32.dp))
+        Button(
+            onClick = {
+                scope.launch {
+                    state = resolver.resolve()
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Refresh Capability")
         }
     }
 }
 
-enum class AppDestinations(
-    val label: String,
-    val icon: ImageVector,
-) {
-    HOME("Home", Icons.Default.Home),
-    FAVORITES("Favorites", Icons.Default.Favorite),
-    PROFILE("Profile", Icons.Default.AccountBox),
-}
-
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    OpTraceTheme {
-        Greeting("Android")
+fun StatusRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyLarge)
+        Text(value, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary)
     }
 }
