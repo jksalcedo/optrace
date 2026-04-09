@@ -11,6 +11,7 @@ data class AppOpsEntry(
     val packageName: String,
     val opName: String,
     val mode: String?,
-    val lastAccessTime: Long?,
+    val lastAccessTimeMillis: Long?,
+    val lastRejectTimeMillis: Long?,
     val attributionTag: String?
 )
