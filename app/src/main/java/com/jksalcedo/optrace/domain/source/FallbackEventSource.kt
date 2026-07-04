@@ -25,6 +25,32 @@ class FallbackEventSource(private val context: Context) : PermissionEventSource 
                 AppOpsManager.OPSTR_READ_EXTERNAL_STORAGE,
                 AppOpsManager.OPSTR_WRITE_EXTERNAL_STORAGE
             )
+
+            try {
+                val ops = appOpsManager.getOpsForPackage(
+                    android.os.Process.myUid(),
+                    context.packageName,
+                    opsToTrack
+                )
+
+                ops?.forEach { pkgOps ->
+                    pkgOps.ops.forEach { opEntry ->
+                        entries.add(
+                            AppOpsEntry(
+                                uid = android.os.Process.myUid(),
+                                packageName = pkgOps.packageName,
+                                opName = opEntry.opStr,
+                                mode = modeToString(opEntry.mode),
+                                lastAccessTimeMillis = opEntry.lastAccessTime,
+                                lastRejectTimeMillis = opEntry.lastRejectTime,
+                                attributionTag = null
+                            )
+                        )
+                    }
+                }
+            } catch (e: SecurityException) {
+                // Ignore
+            }
         }
 
         return AppOpsSnapshot(

@@ -7,12 +7,9 @@ object Regexes {
     val pkgWithUid = Regex("""\bUid\s+(\d+)\s+package\s+([A-Za-z0-9._$]+)\s*:?""")
     val pkgOnly = Regex("""\bpackage\s+([A-Za-z0-9._$]+)\s*:?""")
 
-    // Examples matched:
-    // "OP_CAMERA: mode=allow; ..."
-    // "android:camera mode=foreground ..."
     val opLine = Regex("""\b([A-Z0-9_:.]+)\b.*\bmode\s*=\s*([a-zA-Z_]+)""")
 
-    // Optional timing fields often seen in variants
+    // Optional timing fields
     val lastAccess = Regex("""\b(lastAccess(?:Time)?|time)\s*=\s*([0-9]+)""")
     val lastReject = Regex("""\b(lastReject(?:Time)?)\s*=\s*([0-9]+)""")
 
