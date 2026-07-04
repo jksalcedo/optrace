@@ -1,0 +1,9 @@
+Implemented starter technical spec:
+- Core capability resolution for Root and Shizuku
+- Room database schema for permission events
+- Domain models and source abstractions
+- Basic background worker skeleton for collection
+- Status screen in MainActivity
+- Added necessary permissions to manifest
+- Replaced dummy logic in FallbackEventSource with real AppOpsManager history queries
+- Fix DiffSnapshotsUseCase implementation
