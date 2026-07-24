@@ -3,4 +3,7 @@ Initial release:
 - Automatic capability detection (Root / Shizuku / Fallback)
 - Snapshot diffing to detect permission changes over time
 - Background collection via WorkManager
+- Interactive Timeline UI with bottom navigation and real-time permission access logging
+- Manual audit and scan triggers on Timeline and Status screens
 - Status screen showing current capability tier
+- Full system AppOps dump parsing via dumpsys and cmd appops for all installed apps

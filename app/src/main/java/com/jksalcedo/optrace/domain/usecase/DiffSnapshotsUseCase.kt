@@ -23,6 +23,7 @@ class DiffSnapshotsUseCase {
                 p == null -> ChangeType.NEW_OP
                 p.mode != e.mode -> ChangeType.MODE_CHANGED
                 increased(p.lastAccessTimeMillis, e.lastAccessTimeMillis) -> ChangeType.LAST_ACCESS_INCREASED
+                increased(p.lastRejectTimeMillis, e.lastRejectTimeMillis) -> ChangeType.LAST_REJECT_INCREASED
                 else -> null
             } ?: continue
 
@@ -49,5 +50,5 @@ class DiffSnapshotsUseCase {
         "${e.packageName}|${e.opName}|${e.attributionTag.orEmpty()}"
 
     private fun increased(old: Long?, new: Long?): Boolean =
-        old != null && new != null && new > old
+        new != null && (old == null || new > old)
 }

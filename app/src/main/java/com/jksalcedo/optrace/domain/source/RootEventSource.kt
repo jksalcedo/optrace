@@ -11,15 +11,30 @@ class RootEventSource(
 ) : PermissionEventSource {
 
     override suspend fun captureSnapshot(): AppOpsSnapshot {
-        val result = shell.execute("appops get")
-        if (result.exitCode != 0) {
+        val commands = listOf("cmd appops dump", "dumpsys appops", "appops dump")
+        var stdout = ""
+        var stderr = ""
+        var success = false
+
+        for (cmd in commands) {
+            val res = shell.execute(cmd)
+            if (res.exitCode == 0 && res.stdout.isNotBlank()) {
+                stdout = res.stdout
+                success = true
+                break
+            } else {
+                stderr = res.stderr
+            }
+        }
+
+        if (!success) {
             return AppOpsSnapshot(
                 capturedAt = System.currentTimeMillis(),
                 entries = emptyList(),
-                rawText = "appops get failed (exit=${result.exitCode}): ${result.stderr}"
+                rawText = "Failed to dump appops (stderr: $stderr)"
             )
         }
-        return parser.parse(result.stdout, System.currentTimeMillis())
+        return parser.parse(stdout, System.currentTimeMillis())
     }
 
     override fun source(): EventSource = EventSource.ROOT
