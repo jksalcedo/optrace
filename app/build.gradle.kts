@@ -7,7 +7,7 @@ plugins {
 android {
     namespace = "com.jksalcedo.optrace"
     compileSdk {
-        version = release(36) {
+        version = release(37) {
             minorApiLevel = 1
         }
     }
@@ -15,9 +15,9 @@ android {
     defaultConfig {
         applicationId = "com.jksalcedo.optrace"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0-beta.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
