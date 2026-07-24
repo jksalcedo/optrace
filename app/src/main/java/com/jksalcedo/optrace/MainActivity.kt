@@ -3,16 +3,23 @@ package com.jksalcedo.optrace
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.jksalcedo.optrace.core.capability.CapabilityResolverImpl
-import com.jksalcedo.optrace.core.capability.CapabilityState
-import com.jksalcedo.optrace.domain.model.CapabilityTier
+import com.jksalcedo.optrace.ui.navigation.AppDestination
+import com.jksalcedo.optrace.ui.status.StatusScreen
 import com.jksalcedo.optrace.ui.theme.OpTraceTheme
-import kotlinx.coroutines.launch
+import com.jksalcedo.optrace.ui.timeline.TimelineScreen
 
 class MainActivity : ComponentActivity() {
     private val capabilityResolver = CapabilityResolverImpl()
@@ -25,7 +32,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    StatusScreen(capabilityResolver)
+                    AppNavigation(capabilityResolver)
                 }
             }
         }
@@ -33,51 +40,24 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun StatusScreen(resolver: CapabilityResolverImpl) {
-    var state by remember { mutableStateOf<CapabilityState?>(null) }
-    val scope = rememberCoroutineScope()
+private fun AppNavigation(resolver: CapabilityResolverImpl) {
+    var currentDestination by remember { mutableStateOf(AppDestination.TIMELINE) }
 
-    LaunchedEffect(Unit) {
-        state = resolver.resolve()
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text("OpTrace Status", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(16.dp))
-
-        state?.let { s ->
-            StatusRow("Capability Tier", s.tier.name)
-            StatusRow("Shizuku Available", s.shizukuAvailable.toString())
-            StatusRow("Root Available", s.rootAvailable.toString())
-        } ?: Text("Loading status...")
-
-        Spacer(Modifier.height(32.dp))
-        Button(
-            onClick = {
-                scope.launch {
-                    state = resolver.resolve()
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Refresh Capability")
+    NavigationSuiteScaffold(
+        navigationSuiteItems = {
+            AppDestination.entries.forEach { dest ->
+                item(
+                    selected = currentDestination == dest,
+                    onClick = { currentDestination = dest },
+                    icon = { Icon(dest.icon, contentDescription = dest.label) },
+                    label = { Text(dest.label) }
+                )
+            }
         }
-    }
-}
-
-@Composable
-fun StatusRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, style = MaterialTheme.typography.bodyLarge)
-        Text(value, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary)
+        when (currentDestination) {
+            AppDestination.TIMELINE -> TimelineScreen()
+            AppDestination.STATUS -> StatusScreen(resolver)
+        }
     }
 }

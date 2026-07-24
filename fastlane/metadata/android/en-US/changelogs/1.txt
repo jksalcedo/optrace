@@ -3,4 +3,5 @@ Initial release:
 - Automatic capability detection (Root / Shizuku / Fallback)
 - Snapshot diffing to detect permission changes over time
 - Background collection via WorkManager
+- Timeline UI to view permission access events with bottom navigation
 - Status screen showing current capability tier
