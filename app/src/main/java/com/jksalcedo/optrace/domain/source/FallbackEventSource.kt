@@ -8,55 +8,51 @@ import com.jksalcedo.optrace.domain.model.AppOpsSnapshot
 import com.jksalcedo.optrace.domain.model.EventSource
 
 class FallbackEventSource(private val context: Context) : PermissionEventSource {
-    
+
+    private val opsToTrack = listOf(
+        AppOpsManager.OPSTR_CAMERA,
+        AppOpsManager.OPSTR_FINE_LOCATION,
+        AppOpsManager.OPSTR_COARSE_LOCATION,
+        AppOpsManager.OPSTR_RECORD_AUDIO,
+        AppOpsManager.OPSTR_READ_CONTACTS,
+        AppOpsManager.OPSTR_WRITE_CONTACTS,
+        AppOpsManager.OPSTR_READ_EXTERNAL_STORAGE,
+        AppOpsManager.OPSTR_WRITE_EXTERNAL_STORAGE
+    )
+
     override suspend fun captureSnapshot(): AppOpsSnapshot {
         val appOpsManager = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
         val capturedAt = System.currentTimeMillis()
+        val uid = android.os.Process.myUid()
+        val pkg = context.packageName
         val entries = mutableListOf<AppOpsEntry>()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val opsToTrack = arrayOf(
-                AppOpsManager.OPSTR_CAMERA,
-                AppOpsManager.OPSTR_FINE_LOCATION,
-                AppOpsManager.OPSTR_COARSE_LOCATION,
-                AppOpsManager.OPSTR_RECORD_AUDIO,
-                AppOpsManager.OPSTR_READ_CONTACTS,
-                AppOpsManager.OPSTR_WRITE_CONTACTS,
-                AppOpsManager.OPSTR_READ_EXTERNAL_STORAGE,
-                AppOpsManager.OPSTR_WRITE_EXTERNAL_STORAGE
-            )
-
+        for (op in opsToTrack) {
             try {
-                val ops = appOpsManager.getOpsForPackage(
-                    android.os.Process.myUid(),
-                    context.packageName,
-                    opsToTrack
-                )
-
-                ops?.forEach { pkgOps ->
-                    pkgOps.ops.forEach { opEntry ->
-                        entries.add(
-                            AppOpsEntry(
-                                uid = android.os.Process.myUid(),
-                                packageName = pkgOps.packageName,
-                                opName = opEntry.opStr,
-                                mode = modeToString(opEntry.mode),
-                                lastAccessTimeMillis = opEntry.lastAccessTime,
-                                lastRejectTimeMillis = opEntry.lastRejectTime,
-                                attributionTag = null
-                            )
-                        )
-                    }
+                @Suppress("DEPRECATION")
+                val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    appOpsManager.unsafeCheckOpNoThrow(op, uid, pkg)
+                } else {
+                    appOpsManager.checkOpNoThrow(op, uid, pkg)
                 }
-            } catch (e: SecurityException) {
-                // Ignore
-            }
+                entries.add(
+                    AppOpsEntry(
+                        uid = uid,
+                        packageName = pkg,
+                        opName = op,
+                        mode = modeToString(mode),
+                        lastAccessTimeMillis = null,
+                        lastRejectTimeMillis = null,
+                        attributionTag = null
+                    )
+                )
+            } catch (_: SecurityException) { }
         }
 
         return AppOpsSnapshot(
             capturedAt = capturedAt,
             entries = entries,
-            rawText = if (entries.isEmpty()) "No AppOps history found (Requires Android Q+ or specific permissions)" else null
+            rawText = if (entries.isEmpty()) "No AppOps data available in fallback mode" else null
         )
     }
 

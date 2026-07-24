@@ -1,9 +1,6 @@
-Implemented starter technical spec:
-- Core capability resolution for Root and Shizuku
-- Room database schema for permission events
-- Domain models and source abstractions
-- Basic background worker skeleton for collection
-- Status screen in MainActivity
-- Added necessary permissions to manifest
-- Replaced dummy logic in FallbackEventSource with real AppOpsManager history queries
-- Fix DiffSnapshotsUseCase implementation
+Initial release:
+- Root-based AppOps monitoring and persistent event logging
+- Automatic capability detection (Root / Shizuku / Fallback)
+- Snapshot diffing to detect permission changes over time
+- Background collection via WorkManager
+- Status screen showing current capability tier
