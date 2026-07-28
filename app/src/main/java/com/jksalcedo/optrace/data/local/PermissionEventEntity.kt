@@ -6,10 +6,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "permission_events")
 data class PermissionEventEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val timestamp: Long,  // event time
-    val capturedAt: Long,    // snapshot capture time
-    val snapshotId: String,   // UUID per run
-    val parserVersion: String, // e.g. "appops-v0"
+    val timestamp: Long,
+    val capturedAt: Long,
+    val snapshotId: String,
+    val parserVersion: String,
 
     val uid: Int?,
     val packageName: String,
