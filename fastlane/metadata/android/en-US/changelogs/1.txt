@@ -3,5 +3,9 @@ Initial release:
 - Automatic capability detection (Root / Shizuku / Fallback)
 - Snapshot diffing to detect permission changes over time
 - Background collection via WorkManager
-- Timeline UI to view permission access events with bottom navigation
+- Interactive Timeline UI with bottom navigation and real-time permission access logging
+- Timeline organization with Date & App grouping, category filter chips, search, and app icon resolution
+- UID package resolution for resolving numeric system UIDs to app titles & icons
+- Prioritized access timestamp diffing & Accesses Only filter logic
+- Off-main thread audit execution and chunked database writes for ANR prevention
 - Status screen showing current capability tier
