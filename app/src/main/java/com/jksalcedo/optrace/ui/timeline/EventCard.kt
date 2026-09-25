@@ -16,6 +16,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jksalcedo.optrace.data.local.PermissionEventEntity
+import com.jksalcedo.optrace.ui.settings.UserPreferences
 import com.jksalcedo.optrace.ui.theme.OpTraceTheme
 import com.jksalcedo.optrace.utils.formatTimestamp
 
@@ -37,6 +39,7 @@ fun EventCard(event: PermissionEventEntity) {
     val appInfo = remember(event.packageName) {
         AppInfoResolver.getAppInfo(context, event.packageName)
     }
+    val useFriendly by UserPreferences.friendlyModeLabels.collectAsState()
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -96,8 +99,9 @@ fun EventCard(event: PermissionEventEntity) {
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         event.mode?.let { mode ->
+                            val displayMode = if (useFriendly) ModeLabels.friendly(mode) else mode
                             Text(
-                                " ($mode)",
+                                " ($displayMode)",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

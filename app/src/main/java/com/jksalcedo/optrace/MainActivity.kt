@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.jksalcedo.optrace.core.capability.CapabilityResolverImpl
 import com.jksalcedo.optrace.ui.navigation.AppDestination
+import com.jksalcedo.optrace.ui.settings.SettingsScreen
 import com.jksalcedo.optrace.ui.status.StatusScreen
 import com.jksalcedo.optrace.ui.theme.OpTraceTheme
 import com.jksalcedo.optrace.ui.timeline.TimelineScreen
@@ -58,6 +59,8 @@ private fun AppNavigation(resolver: CapabilityResolverImpl) {
         when (currentDestination) {
             AppDestination.TIMELINE -> TimelineScreen()
             AppDestination.STATUS -> StatusScreen(resolver)
+            AppDestination.SETTINGS -> SettingsScreen()
         }
     }
 }
+

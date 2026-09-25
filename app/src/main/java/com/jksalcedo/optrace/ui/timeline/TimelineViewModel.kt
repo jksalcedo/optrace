@@ -49,7 +49,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     private val app = application as OpTraceApplication
     private val dao = app.database.permissionEventDao()
 
-    private val _rawEvents = dao.observeLatest(500)
+    private val _rawEvents = dao.observeLatest(1000)
 
     val searchQuery = MutableStateFlow("")
     val selectedCategory = MutableStateFlow(PermissionCategory.ALL)

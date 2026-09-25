@@ -17,6 +17,7 @@ import com.jksalcedo.optrace.domain.source.RootEventSource
 import com.jksalcedo.optrace.domain.source.ShizukuEventSource
 import com.jksalcedo.optrace.domain.usecase.CollectPermissionEventsUseCase
 import com.jksalcedo.optrace.domain.usecase.DiffSnapshotsUseCase
+import com.jksalcedo.optrace.ui.settings.UserPreferences
 import com.jksalcedo.optrace.worker.CollectWorker
 import com.jksalcedo.optrace.worker.CollectWorkerFactory
 import java.util.concurrent.TimeUnit
@@ -31,6 +32,8 @@ class OpTraceApplication : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
+
+        UserPreferences.init(this)
 
         database = Room.databaseBuilder(this, AppDatabase::class.java, "optrace.db")
             .fallbackToDestructiveMigration(dropAllTables = true)
