@@ -35,13 +35,13 @@ enum class GroupingMode(val label: String) {
 
 data class DateGroupedEvents(
     val dateHeader: String,
-    val events: List<PermissionEventEntity>
+    val events: List<PermissionEventEntity>,
 )
 
 data class AppGroupedEvents(
     val packageName: String,
     val appName: String,
-    val events: List<PermissionEventEntity>
+    val events: List<PermissionEventEntity>,
 )
 
 class TimelineViewModel(application: Application) : AndroidViewModel(application) {
@@ -53,7 +53,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
 
     val searchQuery = MutableStateFlow("")
     val selectedCategory = MutableStateFlow(PermissionCategory.ALL)
-    val showOnlyAccesses = MutableStateFlow(false)
+    val showOnlyAccesses = MutableStateFlow(value = false)
     val groupingMode = MutableStateFlow(GroupingMode.BY_DATE)
 
     private val _isRefreshing = MutableStateFlow(false)
@@ -63,7 +63,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         _rawEvents,
         searchQuery,
         selectedCategory,
-        showOnlyAccesses
+        showOnlyAccesses,
     ) { events, query, category, onlyAccesses ->
         events.filter { event ->
             // Category filter
@@ -79,16 +79,16 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
 
             // Access filter: strictly matches LAST_ACCESS_INCREASED or LAST_REJECT_INCREASED
             val matchesAccess = if (onlyAccesses) {
-                event.changeType == "LAST_ACCESS_INCREASED" || event.changeType == "LAST_REJECT_INCREASED"
+                (event.changeType == "LAST_ACCESS_INCREASED") || (event.changeType == "LAST_REJECT_INCREASED")
             } else {
                 true
             }
 
             // Search query filter
-            val appInfo = AppInfoResolver.getAppInfo(app, event.packageName)
+            val appName = AppInfoResolver.getAppName(app, event.packageName)
             val matchesQuery = query.isBlank() ||
                     event.packageName.contains(query, ignoreCase = true) ||
-                    appInfo.appName.contains(query, ignoreCase = true) ||
+                    appName.contains(query, ignoreCase = true) ||
                     event.opName.contains(query, ignoreCase = true)
 
             matchesCategory && matchesAccess && matchesQuery
@@ -108,15 +108,14 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         val yesterdayStr = dateFormat.format(Date(now - 86_400_000))
 
         events.groupBy { event ->
-            val eventDateStr = dateFormat.format(Date(event.timestamp))
-            when (eventDateStr) {
+            when (dateFormat.format(Date(event.timestamp))) {
                 todayStr -> "Today"
                 yesterdayStr -> "Yesterday"
                 else -> displayFormat.format(Date(event.timestamp))
             }
-        }.map { (header, items) ->
+        }.asSequence().map { (header, items) ->
             DateGroupedEvents(header, items)
-        }
+        }.toList()
     }
         .flowOn(Dispatchers.Default)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -125,11 +124,13 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         if (mode != GroupingMode.BY_APP) return@combine emptyList()
 
         events.groupBy { it.packageName }
+            .asSequence()
             .map { (pkg, items) ->
-                val appInfo = AppInfoResolver.getAppInfo(app, pkg)
-                AppGroupedEvents(pkg, appInfo.appName, items)
+                val appName = AppInfoResolver.getAppName(app, pkg)
+                AppGroupedEvents(pkg, appName, items)
             }
             .sortedBy { it.appName.lowercase() }
+            .toList()
     }
         .flowOn(Dispatchers.Default)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())

@@ -9,6 +9,7 @@ import androidx.work.WorkManager
 import com.jksalcedo.optrace.core.capability.CapabilityResolverImpl
 import com.jksalcedo.optrace.core.parser.AppOpsParserV1
 import com.jksalcedo.optrace.core.shell.RootShellExecutor
+import com.jksalcedo.optrace.core.shell.ShizukuShellExecutor
 import com.jksalcedo.optrace.data.local.AppDatabase
 import com.jksalcedo.optrace.data.local.SnapshotFileStorage
 import com.jksalcedo.optrace.domain.source.FallbackEventSource
@@ -32,14 +33,15 @@ class OpTraceApplication : Application(), Configuration.Provider {
         super.onCreate()
 
         database = Room.databaseBuilder(this, AppDatabase::class.java, "optrace.db")
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
 
         val parser = AppOpsParserV1()
         val rootShell = RootShellExecutor()
+        val shizukuShell = ShizukuShellExecutor()
 
         val rootSource = RootEventSource(rootShell, parser)
-        val shizukuSource = ShizukuEventSource(this)
+        val shizukuSource = ShizukuEventSource(this, shizukuShell, parser)
         val fallbackSource = FallbackEventSource(this)
 
         collectUseCase = CollectPermissionEventsUseCase(
@@ -50,7 +52,7 @@ class OpTraceApplication : Application(), Configuration.Provider {
             differ = DiffSnapshotsUseCase(),
             eventDao = database.permissionEventDao(),
             snapshotStorage = SnapshotFileStorage(this),
-            parser = parser
+            parser = parser,
         )
 
         schedulePeriodicCollection()

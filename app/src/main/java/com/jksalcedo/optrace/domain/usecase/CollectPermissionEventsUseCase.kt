@@ -51,7 +51,7 @@ class CollectPermissionEventsUseCase(
 
         // On initial baseline scan (previous == null), filter out static entries without access timestamps to avoid DB bloat
         val eventsToPersist = if (previous == null) {
-            rawEvents.filter { it.lastAccessTimeMillis != null || it.lastRejectTimeMillis != null }
+            rawEvents.filter { (it.lastAccessTimeMillis != null) || (it.lastRejectTimeMillis != null) }
         } else {
             rawEvents
         }
