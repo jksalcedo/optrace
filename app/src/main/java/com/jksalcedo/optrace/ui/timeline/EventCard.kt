@@ -24,8 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jksalcedo.optrace.data.local.PermissionEventEntity
+import com.jksalcedo.optrace.ui.theme.OpTraceTheme
 import com.jksalcedo.optrace.utils.formatTimestamp
 
 @Composable
@@ -106,6 +108,30 @@ fun EventCard(event: PermissionEventEntity) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun EventCardPreview() {
+    OpTraceTheme {
+        EventCard(
+            event = PermissionEventEntity(
+                timestamp = System.currentTimeMillis(),
+                capturedAt = System.currentTimeMillis(),
+                snapshotId = "preview",
+                parserVersion = "v1",
+                uid = 10000,
+                packageName = "com.example.app",
+                opName = "OP_CAMERA",
+                mode = "allow",
+                attributionTag = null,
+                changeType = "LAST_ACCESS_INCREASED",
+                source = "ROOT",
+                confidence = "DIRECT",
+                rawRef = null
+            )
+        )
+    }
+}
+
 @Composable
 fun AppGroupCard(appGroup: AppGroupedEvents) {
     var expanded by remember { mutableStateOf(false) }
@@ -182,5 +208,35 @@ fun AppGroupCard(appGroup: AppGroupedEvents) {
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AppGroupCardPreview() {
+    OpTraceTheme {
+        AppGroupCard(
+            appGroup = AppGroupedEvents(
+                packageName = "com.example.app",
+                appName = "Example App",
+                events = listOf(
+                    PermissionEventEntity(
+                        timestamp = System.currentTimeMillis(),
+                        capturedAt = System.currentTimeMillis(),
+                        snapshotId = "preview",
+                        parserVersion = "v1",
+                        uid = 10000,
+                        packageName = "com.example.app",
+                        opName = "OP_CAMERA",
+                        mode = "allow",
+                        attributionTag = null,
+                        changeType = "LAST_ACCESS_INCREASED",
+                        source = "ROOT",
+                        confidence = "DIRECT",
+                        rawRef = null
+                    )
+                )
+            )
+        )
     }
 }
