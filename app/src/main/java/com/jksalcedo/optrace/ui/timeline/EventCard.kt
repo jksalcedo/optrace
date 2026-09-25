@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.jksalcedo.optrace.data.local.PermissionEventEntity
 import com.jksalcedo.optrace.ui.theme.OpTraceTheme
 import com.jksalcedo.optrace.utils.formatTimestamp
@@ -44,7 +45,7 @@ fun EventCard(event: PermissionEventEntity) {
         )
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // App Icon
@@ -62,6 +63,7 @@ fun EventCard(event: PermissionEventEntity) {
                         appInfo.appName,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
                         maxLines = 1
                     )
                     Text(
@@ -74,11 +76,12 @@ fun EventCard(event: PermissionEventEntity) {
                 Text(
                     event.packageName,
                     style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1
                 )
 
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(4.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -88,7 +91,7 @@ fun EventCard(event: PermissionEventEntity) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             OpLabels.label(event.opName),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -159,11 +162,13 @@ fun AppGroupCard(appGroup: AppGroupedEvents) {
                     Text(
                         appGroup.appName,
                         style = MaterialTheme.typography.titleMedium,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         appGroup.packageName,
                         style = MaterialTheme.typography.bodySmall,
+                        fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
