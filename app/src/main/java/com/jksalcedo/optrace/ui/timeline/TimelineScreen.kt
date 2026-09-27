@@ -47,7 +47,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -178,10 +177,30 @@ private fun TimelineControlHeader(
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             PermissionCategory.entries.forEach { category ->
+                val group = when (category) {
+                    PermissionCategory.CAMERA     -> PermissionGroup.CAMERA
+                    PermissionCategory.LOCATION   -> PermissionGroup.LOCATION
+                    PermissionCategory.MICROPHONE -> PermissionGroup.MICROPHONE
+                    PermissionCategory.CONTACTS   -> PermissionGroup.CONTACTS
+                    PermissionCategory.STORAGE    -> PermissionGroup.STORAGE
+                    PermissionCategory.OTHER,
+                    PermissionCategory.ALL        -> null
+                }
                 FilterChip(
                     selected = selectedCategory == category,
                     onClick = { onCategorySelected(category) },
-                    label = { Text(category.label) }
+                    label = { Text(category.label) },
+                    leadingIcon = if (group != null) ({
+                        Icon(
+                            imageVector = group.icon,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = if (selectedCategory == category)
+                                group.tint
+                            else
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }) else null
                 )
             }
         }
@@ -270,29 +289,8 @@ fun AppIconImage(appInfo: AppInfo) {
     }
 }
 
-@Composable
-fun ChangeTypeBadge(changeType: String) {
-    val (label, color) = when (changeType) {
-        "NEW_OP" -> "New" to Color(0xFF4CAF50)
-        "MODE_CHANGED" -> "Mode Changed" to Color(0xFFFF9800)
-        "LAST_ACCESS_INCREASED" -> "Accessed" to Color(0xFF2196F3)
-        "LAST_REJECT_INCREASED" -> "Rejected" to Color(0xFFF44336)
-        "ATTRIBUTION_CHANGED" -> "Attribution" to Color(0xFF9C27B0)
-        else -> changeType to MaterialTheme.colorScheme.primary
-    }
-
-    Surface(
-        color = color.copy(alpha = 0.15f),
-        shape = MaterialTheme.shapes.small
-    ) {
-        Text(
-            label,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-            style = MaterialTheme.typography.labelSmall,
-            color = color
-        )
-    }
-}
+// ChangeTypeBadge removed — replaced by AnomalyBadge in EventCard.kt
+// which only surfaces non-normal events (deny / mode-change / new op).
 
 @Composable
 private fun EmptyState(

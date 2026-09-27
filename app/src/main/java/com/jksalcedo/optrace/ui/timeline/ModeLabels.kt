@@ -2,10 +2,6 @@ package com.jksalcedo.optrace.ui.timeline
 
 /**
  * Maps raw AppOps mode strings to user-friendly descriptions.
- *
- * Android's `appops` subsystem uses terse mode names (allow, ignore, error, foreground, default)
- * that can be confusing — e.g. "ignore" really means "silently denied" rather than "the system
- * is ignoring this permission". This helper provides opt-in human-readable translations.
  */
 object ModeLabels {
 
