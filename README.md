@@ -20,18 +20,10 @@ Privilege Methods:
 1. **Root (Magisk / KernelSU / APatch / su):** Executes privileged shell queries directly on-device.
 2. **Shizuku:** ADB-level privilege integration *(In Progress)*.
 
-## Tech Stack
-
-* **Language:** Kotlin
-* **UI:** Jetpack Compose (Material 3) with Adaptive Navigation Suite
-* **Database:** Room (SQLite)
-* **Background Work:** WorkManager
-* **Privilege Escalation:** Root Shell / Shizuku API
-
 ## Requirements
 
 * Android 7.0+ (API 24+)
-* Rooted device (Magisk, KernelSU, APatch, etc.) OR [Shizuku](https://shizuku.rikka.app/) *(planned)*.
+* Rooted device (Magisk, KernelSU, APatch, etc.) OR [Shizuku](https://shizuku.rikka.app/) .
 
 ## License
 
